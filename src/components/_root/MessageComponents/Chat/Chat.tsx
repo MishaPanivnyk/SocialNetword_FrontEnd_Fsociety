@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
-import ChatCloud from '../ChatCloud/ChatCloud';
-import ChatList from '../ChatList/ChatList';
-import axios from 'axios';
-import { Option } from '../../../__ui/DropMenu/DropMenu';
-import { MyProfileContext } from '../../HomeLayout/HomeLayout';
+import { useContext, useEffect, useState } from "react";
+import ChatCloud from "../ChatCloud/ChatCloud";
+import ChatList from "../ChatList/ChatList";
+import axios from "axios";
+import { Option } from "../../../__ui/DropMenu/DropMenu";
+import { MyProfileContext } from "../../HomeLayout/HomeLayout";
 
 export type User = {
   email: string;
@@ -32,56 +32,71 @@ const Chat = () => {
   const [activeUser, setActiveUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<number>(0);
 
-
   useEffect(() => {
-    const getChatRooms = async() => {  
-      if(myProfile) {
+    const getChatRooms = async () => {
+      if (myProfile) {
         try {
-          const response = await axios.get(`https://socialnetword-fsociety.onrender.com/chat/user_chat_rooms/${myProfile.name}`);
+          const response = await axios.get(
+            `https://social-netword-fsociety-gamma.vercel.app/chat/user_chat_rooms/${myProfile.name}`
+          );
           setUserChatList(response.data);
           if (response.data.length > 0) {
             setActiveUser(response.data[0].receiver); // Встановлюємо першого користувача в списку як активного
           }
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          console.error("Error fetching user data:", error);
         }
       }
     };
     getChatRooms();
-
   }, [myProfile]);
 
   const handleUserClick = (user: User, roomId: number) => {
     setActiveUser(user);
-    setRoomId(roomId)
+    setRoomId(roomId);
   };
 
   const deleteChat = async () => {
     try {
       const formData = new FormData();
-      formData.append('room_id', roomId.toString());
-      await axios.post('https://socialnetword-fsociety.onrender.com/chat/delete_chat/', formData)
+      formData.append("room_id", roomId.toString());
+      await axios.post(
+        "https://social-netword-fsociety-gamma.vercel.app/chat/delete_chat/",
+        formData
+      );
       window.location.reload();
     } catch (e) {
       console.log(e);
     }
-  }
+  };
   const menuOptions: Option = {
-    label: 'Delete chat',
+    label: "Delete chat",
     onClick: deleteChat,
-  }
+  };
   const menuOptionsArray: Option[] = [];
   menuOptionsArray.push(menuOptions);
 
   return (
-    <div className='d-flex justify-content-between'>
-      {activeUser && myProfile ? <ChatCloud myProfile={myProfile} menuOptionsArray={menuOptionsArray} activUser={activeUser} roomId={roomId} /> : null}
-      <div className='col-3'>
-        {myProfile? <ChatList myName={myProfile.name } chatList={userChatList} onUserClick={handleUserClick} /> : null}
-
+    <div className="d-flex justify-content-between">
+      {activeUser && myProfile ? (
+        <ChatCloud
+          myProfile={myProfile}
+          menuOptionsArray={menuOptionsArray}
+          activUser={activeUser}
+          roomId={roomId}
+        />
+      ) : null}
+      <div className="col-3">
+        {myProfile ? (
+          <ChatList
+            myName={myProfile.name}
+            chatList={userChatList}
+            onUserClick={handleUserClick}
+          />
+        ) : null}
       </div>
     </div>
   );
-}
+};
 
-export default Chat
+export default Chat;
